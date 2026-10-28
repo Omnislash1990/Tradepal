@@ -1,0 +1,109 @@
+@import "tailwindcss";
+
+@theme {
+  /* Tradepal blue #1769D2 — primary actions, links, highlights */
+  --color-brand-50: #eef4fc;
+  --color-brand-100: #d8e6f8;
+  --color-brand-200: #b2cdf1;
+  --color-brand-300: #7faee8;
+  --color-brand-400: #4a8dde;
+  --color-brand-500: #1769d2;
+  --color-brand-600: #1358b2;
+  --color-brand-700: #104891;
+  --color-brand-800: #0e3b75;
+  --color-brand-900: #0c305e;
+
+  /* Navy #172B4D — text, headings, dark surfaces */
+  --color-ink-900: #172b4d;
+  --color-ink-800: #253858;
+  --color-ink-700: #344563;
+  --color-ink-600: #505f79;
+  --color-ink-500: #5e6c84;
+  --color-ink-400: #97a0af;
+  --color-ink-300: #c1c7d0;
+  --color-ink-200: #dfe1e6;
+  --color-ink-100: #ebecf0;
+
+  /* Light grey #F1F5F9 — page sections and quiet surfaces */
+  --color-mist: #f1f5f9;
+  --color-mist-dark: #e2e8f0;
+
+  --color-success-50: #e9f6ef;
+  --color-success-600: #1f845a;
+  --color-success-700: #176b48;
+  --color-warning-50: #fff6e5;
+  --color-warning-600: #b65c02;
+  --color-warning-700: #974f0c;
+  --color-danger-50: #fdecea;
+  --color-danger-600: #c9372c;
+  --color-danger-700: #ae2e24;
+
+  --radius-card: 1rem;
+  --shadow-card: 0 1px 2px rgb(23 43 77 / 0.06), 0 1px 3px rgb(23 43 77 / 0.08);
+  --shadow-lift: 0 8px 24px rgb(23 43 77 / 0.12);
+
+  --animate-fade-in: fade-in 0.2s ease-out;
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+      transform: translateY(4px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+}
+
+@theme inline {
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-display: var(--font-jakarta), var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    scroll-padding-top: 5rem;
+  }
+  body {
+    @apply bg-white font-sans text-ink-900 antialiased;
+  }
+  h1,
+  h2,
+  h3,
+  h4 {
+    @apply font-display tracking-tight text-ink-900;
+  }
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-brand-500;
+  }
+  ::selection {
+    @apply bg-brand-100 text-ink-900;
+  }
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  input[type="number"] {
+    -moz-appearance: textfield;
+  }
+}
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  body {
+    background: white;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

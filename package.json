@@ -1,0 +1,44 @@
+{
+  "name": "tradepal",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "predev": "tsx --conditions=react-server scripts/ensure-db.ts",
+    "dev": "next dev",
+    "prebuild": "tsx --conditions=react-server scripts/ensure-db.ts",
+    "build": "next build",
+    "prestart": "tsx --conditions=react-server scripts/ensure-db.ts",
+    "start": "next start",
+    "lint": "eslint",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "tsx --conditions=react-server scripts/migrate.ts",
+    "db:seed": "tsx --conditions=react-server scripts/seed.ts",
+    "db:reset": "tsx --conditions=react-server scripts/reset-db.ts"
+  },
+  "dependencies": {
+    "@libsql/client": "^0.18.0",
+    "drizzle-orm": "^0.45.4",
+    "lucide-react": "^1.62.0",
+    "next": "16.4.3",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "server-only": "^0.0.1",
+    "stripe": "^23.0.1",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@tailwindcss/turbopack": "^4",
+    "@types/node": "^24.19.2",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "drizzle-kit": "^0.31.11",
+    "eslint": "^9",
+    "eslint-config-next": "16.4.3",
+    "tailwindcss": "^4",
+    "tsx": "^4.23.15",
+    "typescript": "^5",
+    "vitest": "^5.0.5"
+  }
+}

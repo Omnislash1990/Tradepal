@@ -1,0 +1,30 @@
+import {
+  Bath,
+  Bolt,
+  BrickWall,
+  Droplets,
+  Fence,
+  Grid2x2,
+  Hammer,
+  Layers,
+  PaintRoller,
+  Thermometer,
+  TreePine,
+  Zap,
+  type LucideIcon,
+} from "lucide-react";
+
+export const CATEGORY_ICONS: Record<string, LucideIcon> = {
+  Layers,
+  TreePine,
+  BrickWall,
+  Thermometer,
+  Droplets,
+  Zap,
+  Hammer,
+  Bath,
+  PaintRoller,
+  Grid2x2,
+  Bolt,
+  Fence,
+};
