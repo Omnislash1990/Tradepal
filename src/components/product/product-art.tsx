@@ -1,7 +1,7 @@
 import { cn } from "@/lib/cn";
-import { ProductPhoto } from "./product-photo";
+import { ProductShot } from "./product-shot";
 
-/** Studio product shot. Uses a supplier photo when `imageUrl` is set. */
+/** Product photography. Uses a supplier URL when set, otherwise the local pack shot. */
 export function ProductArt({
   imageKey,
   imageUrl,
@@ -22,5 +22,5 @@ export function ProductArt({
       <img src={imageUrl} alt={alt ?? name ?? ""} className={cn("aspect-square rounded-xl bg-white object-contain", className)} />
     );
   }
-  return <ProductPhoto imageKey={imageKey} name={name || alt || ""} className={className} />;
+  return <ProductShot imageKey={imageKey} name={name || alt || ""} alt={alt ?? name} className={className} />;
 }
