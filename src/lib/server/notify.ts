@@ -1,6 +1,7 @@
 import "server-only";
 import { eq } from "drizzle-orm";
 import { db } from "@/lib/db";
+import { appUrl as publicOrigin } from "@/lib/server/app-url";
 import { notifications } from "@/lib/db/schema";
 
 export type EmailTemplate =
@@ -73,6 +74,5 @@ export async function sendEmail(input: {
 }
 
 export function appUrl(path = ""): string {
-  const base = (process.env.APP_URL || "http://localhost:3000").replace(/\/$/, "");
-  return `${base}${path}`;
+  return `${publicOrigin()}${path}`;
 }

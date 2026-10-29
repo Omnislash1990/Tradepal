@@ -4,7 +4,7 @@ import { and, eq, gt, lt } from "drizzle-orm";
 import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { cache } from "react";
-import { db } from "@/lib/db";
+import { db, ensureDatabase } from "@/lib/db";
 import { sessions, tradeAccounts, users, type AccountType, type Role, type TradeStatus } from "@/lib/db/schema";
 import { newToken } from "@/lib/ids";
 
@@ -80,6 +80,7 @@ export async function endAllSessions(userId: string): Promise<void> {
 }
 
 export const getCurrentUser = cache(async (): Promise<CurrentUser | null> => {
+  await ensureDatabase();
   const token = (await cookies()).get(SESSION_COOKIE)?.value;
   if (!token) return null;
   const [row] = await db

@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, Plus_Jakarta_Sans } from "next/font/google";
+import { appUrl } from "@/lib/server/app-url";
 import "./globals.css";
 
 const inter = Inter({
@@ -15,7 +16,7 @@ const jakarta = Plus_Jakarta_Sans({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.APP_URL || "http://localhost:3000"),
+  metadataBase: new URL(appUrl()),
   title: { default: "Tradepal — Your building materials, sorted.", template: "%s · Tradepal" },
   description:
     "AI-powered building materials for tradespeople and DIY, starting in the West Midlands. Search, estimate quantities and order online.",

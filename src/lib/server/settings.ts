@@ -1,6 +1,6 @@
 import "server-only";
 import { cache } from "react";
-import { db } from "@/lib/db";
+import { db, ensureDatabase } from "@/lib/db";
 import { settings } from "@/lib/db/schema";
 import { DEFAULT_BANK_HOLIDAYS } from "@/lib/domain/delivery";
 
@@ -79,6 +79,7 @@ export const DEFAULT_SETTINGS: AppSettings = {
 };
 
 export const getSettings = cache(async (): Promise<AppSettings> => {
+  await ensureDatabase();
   const rows = await db.select().from(settings);
   const stored = Object.fromEntries(rows.map((r) => [r.key, r.value])) as Partial<AppSettings>;
   return {

@@ -4,6 +4,7 @@ import { connection } from "next/server";
 import { cache } from "react";
 import type { CustomerPricing } from "@/lib/domain/pricing";
 import { parsePostcode, type ParsedPostcode } from "@/lib/domain/postcode";
+import { ensureDatabase } from "@/lib/db";
 import { getCurrentUser, type CurrentUser } from "./auth";
 import { getSettings } from "./settings";
 
@@ -24,6 +25,7 @@ export type Viewer = {
 
 export const getViewer = cache(async (): Promise<Viewer> => {
   await connection();
+  await ensureDatabase();
   const jar = await cookies();
   const [user, settings] = await Promise.all([getCurrentUser(), getSettings()]);
   const pricing =

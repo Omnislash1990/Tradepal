@@ -1,8 +1,10 @@
 import { NextResponse } from "next/server";
 import type Stripe from "stripe";
+import { ensureDatabase } from "@/lib/db";
 import { handleExpiredSession, handleFailedSession, handlePaidSession, stripe, stripeWebhookConfigured } from "@/lib/server/payments";
 
 export async function POST(request: Request) {
+  await ensureDatabase();
   if (!stripeWebhookConfigured()) {
     return NextResponse.json({ error: "Webhook is not configured" }, { status: 501 });
   }
