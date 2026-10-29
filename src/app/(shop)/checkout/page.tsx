@@ -67,7 +67,7 @@ export default async function CheckoutPage({ searchParams }: PageProps<"/checkou
           <ul className="mt-3 space-y-3">
             {basket.lines.map((l) => (
               <li key={l.card.id} className="flex gap-3 text-sm">
-                <ProductArt imageKey={l.card.imageKey} categorySlug={l.card.categorySlug} className="size-12 shrink-0" />
+                <ProductArt imageKey={l.card.imageKey} categorySlug={l.card.categorySlug} name={l.card.name} className="size-12 shrink-0" />
                 <div className="flex-1">
                   <p className="font-medium">{l.card.name}</p>
                   <p className="text-ink-500">

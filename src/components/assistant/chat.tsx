@@ -177,7 +177,7 @@ function ProductHits({ products }: { products: ProductSummary[] }) {
       <ul className="mt-3 space-y-3">
         {products.map((p) => (
           <li key={p.id} className="flex gap-3">
-            <ProductArt imageKey={p.imageKey} categorySlug="" className="size-14 shrink-0" />
+            <ProductArt imageKey={p.imageKey} name={p.name} className="size-14 shrink-0" />
             <div>
               <Link href={`/products/${p.slug}`} className="text-sm font-semibold hover:text-brand-700">
                 {p.name}

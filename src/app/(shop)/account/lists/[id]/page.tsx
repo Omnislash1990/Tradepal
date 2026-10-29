@@ -42,7 +42,7 @@ export default async function ListDetailPage({ params }: PageProps<"/account/lis
           const card = toCard(product, catalog, ctx);
           return (
             <li key={item.id} className="flex items-center gap-4 rounded-2xl p-3 ring-1 ring-ink-200">
-              <ProductArt imageKey={card.imageKey} categorySlug={card.categorySlug} className="size-16" />
+              <ProductArt imageKey={card.imageKey} categorySlug={card.categorySlug} name={card.name} className="size-16" />
               <div className="flex-1">
                 <a href={`/products/${card.slug}`} className="font-semibold hover:text-brand-700">
                   {card.name}

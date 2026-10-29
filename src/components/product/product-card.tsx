@@ -12,7 +12,7 @@ export function ProductCard({ product, exVat }: { product: ProductCardData; exVa
   return (
     <article className="group relative flex flex-col rounded-2xl bg-white p-3 shadow-card ring-1 ring-ink-200 transition hover:shadow-lift hover:ring-brand-200">
       <div className="relative">
-        <ProductArt imageKey={product.imageKey} categorySlug={product.categorySlug} imageUrl={product.imageUrl} alt={product.name} />
+        <ProductArt imageKey={product.imageKey} categorySlug={product.categorySlug} imageUrl={product.imageUrl} name={product.name} alt={product.name} />
         <div className="absolute top-2 left-2 flex flex-col items-start gap-1">
           {discountPct > 0 && <Badge tone="danger">Save {discountPct}%</Badge>}
           {product.price.kind === "trade" && <Badge tone="brand">Trade price</Badge>}

@@ -46,7 +46,7 @@ export default async function ProductPage({ params }: PageProps<"/products/[slug
       </nav>
       <div className="mt-6 grid gap-10 lg:grid-cols-[minmax(0,1fr)_24rem]">
         <div>
-          <ProductArt imageKey={product.imageKey} categorySlug={product.category.slug} imageUrl={product.imageUrl} alt={product.name} className="max-w-lg" />
+          <ProductArt imageKey={product.imageKey} categorySlug={product.category.slug} imageUrl={product.imageUrl} name={product.name} alt={product.name} className="w-full max-w-lg" />
           <div className="prose mt-8 max-w-none">
             <h2 className="text-lg font-bold">Description</h2>
             <p className="mt-2 whitespace-pre-wrap text-ink-700">{product.description}</p>
@@ -115,7 +115,7 @@ export default async function ProductPage({ params }: PageProps<"/products/[slug
           <ul className="mt-4 grid gap-3 sm:grid-cols-2">
             {alts.map((a) => (
               <li key={a.card.id} className="flex gap-4 rounded-2xl bg-white p-3 ring-1 ring-ink-200">
-                <ProductArt imageKey={a.card.imageKey} categorySlug={a.card.categorySlug} className="size-20 shrink-0" />
+                <ProductArt imageKey={a.card.imageKey} categorySlug={a.card.categorySlug} name={a.card.name} className="size-20 shrink-0" />
                 <div>
                   <a href={`/products/${a.card.slug}`} className="font-semibold hover:text-brand-700">
                     {a.card.name}

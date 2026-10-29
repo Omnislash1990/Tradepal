@@ -32,7 +32,7 @@ export default async function BasketPage() {
           <ul className="space-y-4">
             {basket.lines.map((line) => (
               <li key={line.card.id} className="flex gap-4 rounded-2xl bg-white p-4 shadow-card ring-1 ring-ink-200">
-                <ProductArt imageKey={line.card.imageKey} categorySlug={line.card.categorySlug} className="size-24 shrink-0" />
+                <ProductArt imageKey={line.card.imageKey} categorySlug={line.card.categorySlug} name={line.card.name} className="size-24 shrink-0" />
                 <div className="min-w-0 flex-1">
                   <a href={`/products/${line.card.slug}`} className="font-semibold hover:text-brand-700">
                     {line.card.name}
