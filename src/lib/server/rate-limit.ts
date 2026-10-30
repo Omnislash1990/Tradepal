@@ -10,19 +10,25 @@ export type RateLimitResult = { ok: boolean; remaining: number; retryAfterSecond
 export async function hitRateLimit(key: string, limit: number, windowSeconds: number): Promise<RateLimitResult> {
   const nowSeconds = Math.floor(Date.now() / 1000);
   const windowStart = nowSeconds - (nowSeconds % windowSeconds);
-  const [row] = await db
-    .insert(rateLimits)
-    .values({ key, windowStart, count: 1 })
-    .onConflictDoUpdate({ target: [rateLimits.key, rateLimits.windowStart], set: { count: sql`${rateLimits.count} + 1` } })
-    .returning({ count: rateLimits.count });
-  if (row.count === 1 && windowStart % 3600 === 0) {
-    await db.delete(rateLimits).where(lt(rateLimits.windowStart, nowSeconds - 2 * 86400));
+  try {
+    const [row] = await db
+      .insert(rateLimits)
+      .values({ key, windowStart, count: 1 })
+      .onConflictDoUpdate({ target: [rateLimits.key, rateLimits.windowStart], set: { count: sql`${rateLimits.count} + 1` } })
+      .returning({ count: rateLimits.count });
+    const used = row?.count ?? 1;
+    if (used === 1 && windowStart % 3600 === 0) {
+      await db.delete(rateLimits).where(lt(rateLimits.windowStart, nowSeconds - 2 * 86400)).catch(() => undefined);
+    }
+    return {
+      ok: used <= limit,
+      remaining: Math.max(0, limit - used),
+      retryAfterSeconds: windowStart + windowSeconds - nowSeconds,
+    };
+  } catch (err) {
+    console.error("[rate-limit]", err);
+    return { ok: true, remaining: limit, retryAfterSeconds: 0 };
   }
-  return {
-    ok: row.count <= limit,
-    remaining: Math.max(0, limit - row.count),
-    retryAfterSeconds: windowStart + windowSeconds - nowSeconds,
-  };
 }
 
 export async function clientIp(): Promise<string> {

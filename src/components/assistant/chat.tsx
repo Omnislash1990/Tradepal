@@ -2,7 +2,7 @@
 
 import { Sparkles } from "lucide-react";
 import Link from "next/link";
-import { useRef, useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { addItemsAction } from "@/app/actions/basket";
 import { assistantTurnAction } from "@/app/actions/assistant";
 import { ProductArt } from "@/components/product/product-art";
@@ -14,7 +14,7 @@ import { cn } from "@/lib/cn";
 
 type Message = { role: "user" | "assistant"; text: string; turn?: AssistantTurn };
 
-export function AssistantChat() {
+export function AssistantChat({ initialQuery = "" }: { initialQuery?: string }) {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "assistant",
@@ -26,6 +26,9 @@ export function AssistantChat() {
   const [pending, start] = useTransition();
   const [added, setAdded] = useState<string | null>(null);
   const bottom = useRef<HTMLDivElement>(null);
+  const startedInitial = useRef(false);
+  const stateRef = useRef(state);
+  stateRef.current = state;
 
   function send(text: string) {
     const message = text.trim();
@@ -34,12 +37,32 @@ export function AssistantChat() {
     setAdded(null);
     setMessages((m) => [...m, { role: "user", text: message }]);
     start(async () => {
-      const turn = await assistantTurnAction(message, state);
-      setState(turn.state);
-      setMessages((m) => [...m, { role: "assistant", text: turn.reply.text, turn }]);
+      try {
+        const turn = await assistantTurnAction(message, stateRef.current);
+        if (!turn?.reply) throw new Error("empty assistant reply");
+        setState(turn.state);
+        setMessages((m) => [...m, { role: "assistant", text: turn.reply.text, turn }]);
+      } catch (err) {
+        console.error("[assistant chat]", err);
+        setMessages((m) => [
+          ...m,
+          {
+            role: "assistant",
+            text: "I couldn't finish that just now. Please try again, or browse the catalogue.",
+          },
+        ]);
+      }
       queueMicrotask(() => bottom.current?.scrollIntoView({ behavior: "smooth" }));
     });
   }
+
+  useEffect(() => {
+    if (!initialQuery || startedInitial.current) return;
+    startedInitial.current = true;
+    send(initialQuery);
+    // Initial URL query is sent once on mount.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialQuery]);
 
   const lastEstimate = [...messages].reverse().find((m) => m.turn?.reply.estimate)?.turn?.reply.estimate ?? null;
   const lastProducts = [...messages].reverse().find((m) => m.turn && m.turn.products.length > 0)?.turn?.products ?? [];

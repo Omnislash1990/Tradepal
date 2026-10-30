@@ -177,7 +177,7 @@ async function complete(
           contents: [{ role: "user", parts: [{ text: userContent }] }],
           generationConfig: { responseMimeType: "application/json", temperature: 0, maxOutputTokens: 400 },
         }),
-        signal: AbortSignal.timeout(12_000),
+        signal: AbortSignal.timeout(process.env.VERCEL ? 5_000 : 12_000),
       },
     );
     if (!res.ok) throw new Error(`Gemini ${res.status}: ${(await res.text()).slice(0, 200)}`);
@@ -204,7 +204,7 @@ async function complete(
         response_format: { type: "json_object" },
         max_completion_tokens: 400,
       }),
-      signal: AbortSignal.timeout(10_000),
+      signal: AbortSignal.timeout(process.env.VERCEL ? 5_000 : 10_000),
     });
     if (!res.ok) throw new Error(`OpenAI ${res.status}: ${(await res.text()).slice(0, 200)}`);
     const data = (await res.json()) as {
@@ -226,7 +226,7 @@ async function complete(
       system: SYSTEM_PROMPT,
       messages: [{ role: "user", content: userContent }],
     }),
-    signal: AbortSignal.timeout(10_000),
+    signal: AbortSignal.timeout(process.env.VERCEL ? 5_000 : 10_000),
   });
   if (!res.ok) throw new Error(`Anthropic ${res.status}: ${(await res.text()).slice(0, 200)}`);
   const data = (await res.json()) as {

@@ -101,13 +101,18 @@ function materialLookup(catalog: Catalog, viewer: Viewer): MaterialLookup {
 }
 
 async function llmCallsToday(): Promise<number> {
-  const since = new Date();
-  since.setUTCHours(0, 0, 0, 0);
-  const [row] = await db
-    .select({ n: count() })
-    .from(aiUsage)
-    .where(and(ne(aiUsage.provider, "rules"), gte(aiUsage.createdAt, since)));
-  return row.n;
+  try {
+    const since = new Date();
+    since.setUTCHours(0, 0, 0, 0);
+    const [row] = await db
+      .select({ n: count() })
+      .from(aiUsage)
+      .where(and(ne(aiUsage.provider, "rules"), gte(aiUsage.createdAt, since)));
+    return row.n;
+  } catch (err) {
+    console.error("[ai usage count]", err);
+    return Number.MAX_SAFE_INTEGER;
+  }
 }
 
 /** Messages the rules couldn't place that read like a sentence rather than a product name. */
@@ -153,28 +158,40 @@ export async function runAssistantTurn(message: string, rawState: unknown, viewe
     worthAskingModel(text) &&
     (await llmCallsToday()) < settings.ai.dailyLlmLimit
   ) {
-    const result = await interpretWithLlm(text, state);
-    provider = config.provider;
-    model = config.model;
-    inputTokens = result.inputTokens;
-    outputTokens = result.outputTokens;
-    success = !result.error;
-    if (result.interpretation) interpretation = result.interpretation;
+    try {
+      const result = await interpretWithLlm(text, state);
+      provider = config.provider;
+      model = config.model;
+      inputTokens = result.inputTokens;
+      outputTokens = result.outputTokens;
+      success = !result.error;
+      if (result.interpretation) interpretation = result.interpretation;
+    } catch (err) {
+      console.error("[assistant llm]", err);
+      success = false;
+    }
   }
 
   const { state: nextState, reply } = respond(state, text, { lookup: materialLookup(catalog, viewer), interpretation });
 
   let products: ProductSummary[] = [];
   if (reply.productQuery) {
-    const ranked = await rankProducts(reply.productQuery, 6);
-    products = ranked.map((r) => catalog.byId.get(r.id)).filter((p) => !!p).map((p) => summary(p!, catalog, viewer));
-    await db.insert(searchLogs).values({
-      query: reply.productQuery.slice(0, 200),
-      resultsCount: ranked.length,
-      source: "assistant",
-      detectedJob: detectJobInQuery(reply.productQuery),
-      userId: viewer.user?.id ?? null,
-    });
+    try {
+      const ranked = await rankProducts(reply.productQuery, 6);
+      products = ranked.map((r) => catalog.byId.get(r.id)).filter((p) => !!p).map((p) => summary(p!, catalog, viewer));
+      await db
+        .insert(searchLogs)
+        .values({
+          query: reply.productQuery.slice(0, 200),
+          resultsCount: ranked.length,
+          source: "assistant",
+          detectedJob: detectJobInQuery(reply.productQuery),
+          userId: viewer.user?.id ?? null,
+        })
+        .catch((err) => console.error("[assistant search log]", err));
+    } catch (err) {
+      console.error("[assistant products]", err);
+    }
   }
 
   const estimate: EstimateView | null = reply.estimate
@@ -187,22 +204,25 @@ export async function runAssistantTurn(message: string, rawState: unknown, viewe
       }
     : null;
 
-  await db.insert(aiUsage).values({
-    visitorId: viewer.visitorId,
-    userId: viewer.user?.id ?? null,
-    feature: "assistant",
-    provider,
-    model,
-    intent: reply.intent,
-    inputTokens,
-    outputTokens,
-    costCentipence: Math.round(
-      (inputTokens * settings.ai.inputPencePerMillion + outputTokens * settings.ai.outputPencePerMillion) / 10_000,
-    ),
-    latencyMs: Date.now() - started,
-    success,
-    estimateGross: estimate?.totalGross ?? null,
-  });
+  await db
+    .insert(aiUsage)
+    .values({
+      visitorId: viewer.visitorId,
+      userId: viewer.user?.id ?? null,
+      feature: "assistant",
+      provider,
+      model,
+      intent: reply.intent,
+      inputTokens,
+      outputTokens,
+      costCentipence: Math.round(
+        (inputTokens * settings.ai.inputPencePerMillion + outputTokens * settings.ai.outputPencePerMillion) / 10_000,
+      ),
+      latencyMs: Date.now() - started,
+      success,
+      estimateGross: estimate?.totalGross ?? null,
+    })
+    .catch((err) => console.error("[assistant usage]", err));
 
   return {
     reply: { ...reply, estimate, quickReplies: reply.quickReplies.length ? reply.quickReplies : JOB_STARTERS.slice(0, 3) },

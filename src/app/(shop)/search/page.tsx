@@ -11,6 +11,7 @@ import { queryProducts, type AvailabilityFilter, type CatalogSort } from "@/lib/
 import { getViewer, priceContext } from "@/lib/server/context";
 
 export const metadata = { title: "Search" };
+export const instant = false;
 
 export default async function SearchPage({ searchParams }: PageProps<"/search">) {
   const sp = await searchParams;
@@ -24,13 +25,16 @@ export default async function SearchPage({ searchParams }: PageProps<"/search">)
   const job = q ? detectJobInQuery(q) : null;
 
   if (q) {
-    await db.insert(searchLogs).values({
-      query: q.slice(0, 200),
-      resultsCount: total,
-      source: "search",
-      detectedJob: job,
-      userId: viewer.user?.id ?? null,
-    });
+    await db
+      .insert(searchLogs)
+      .values({
+        query: q.slice(0, 200),
+        resultsCount: total,
+        source: "search",
+        detectedJob: job,
+        userId: viewer.user?.id ?? null,
+      })
+      .catch((err) => console.error("[search log]", err));
   }
 
   return (
